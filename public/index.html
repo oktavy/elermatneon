@@ -2144,6 +2144,30 @@ async function registerUserOnline(username, password, role = 'Siswa') {
     return false;
   }
 }
+    // Fungsi mengirim data daftar akun ke Neon DB lewat Vercel API
+async function registerToNeon(username, password, role = 'Siswa') {
+  try {
+    const response = await fetch('/api/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password, role })
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      alert(`Berhasil! Akun ${result.user.username} sudah tersimpan otomatis di Neon DB.`);
+      return true;
+    } else {
+      alert(`Gagal: ${result.message}`);
+      return false;
+    }
+  } catch (err) {
+    console.error("Eror koneksi:", err);
+    alert("Terjadi kesalahan koneksi ke server.");
+    return false;
+  }
+}
   </script>
 </body>
 </html>
