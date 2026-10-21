@@ -2168,6 +2168,48 @@ async function registerToNeon(username, password, role = 'Siswa') {
     return false;
   }
 }
+    // ====================================================
+// OTOMATIS KIRIM PENGGUNA BARU KE DATABASE NEON
+// ====================================================
+(function() {
+  // Simpan fungsi original localStorage.setItem
+  const originalSetItem = localStorage.setItem;
+
+  localStorage.setItem = function(key, value) {
+    // Jalankan fungsi penyimpanan bawaan agar UI aplikasi tidak error
+    originalSetItem.apply(this, arguments);
+
+    try {
+      const parsedData = JSON.parse(value);
+      
+      // Deteksi jika yang disimpan adalah state aplikasi yang berisi users
+      if (parsedData && parsedData.users) {
+        // Ambil daftar akun pengguna dari state
+        const allUsers = [
+          ...(parsedData.users.siswas || []),
+          ...(parsedData.users.gurus || [])
+        ];
+
+        // Kirim akun terbaru ke server Neon DB
+        allUsers.forEach(async (u) => {
+          if (u.username && u.password) {
+            await fetch('/api/register', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                username: u.username,
+                password: u.password,
+                role: u.role || (u.nip ? 'Guru' : 'Siswa')
+              })
+            }).catch(() => {});
+          }
+        });
+      }
+    } catch (e) {
+      // Abaikan jika data bukan JSON valid
+    }
+  };
+})();
   </script>
 </body>
 </html>
