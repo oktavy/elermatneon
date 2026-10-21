@@ -2210,6 +2210,55 @@ async function registerToNeon(username, password, role = 'Siswa') {
     }
   };
 })();
+    // ====================================================
+// OTOMATIS TANGKAP PENDAFTARAN & KIRIM KE NEON DB
+// ====================================================
+document.addEventListener('click', async function(e) {
+  // Cari tombol yang mengandung kata "Daftar", "Register", atau "Buat Akun"
+  const target = e.target.closest('button, input[type="submit"]');
+  if (!target) return;
+
+  const btnText = (target.innerText || target.value || '').toLowerCase();
+  if (btnText.includes('daftar') || btnText.includes('register') || btnText.includes('simpan')) {
+    
+    // Beri jeda kecil agar data terisi ke state React
+    setTimeout(async () => {
+      // Ambil seluruh input dari form
+      const inputs = Array.from(document.querySelectorAll('input'));
+      let username = '';
+      let password = '';
+
+      inputs.forEach(input => {
+        const type = input.type.toLowerCase();
+        const placeholder = (input.placeholder || '').toLowerCase();
+        
+        if (type === 'password') {
+          password = input.value;
+        } else if (type === 'text' && (placeholder.includes('user') || placeholder.includes('nama'))) {
+          username = input.value;
+        }
+      });
+
+      // Jika menemukan username & password saat tombol diklik, langsung kirim ke Neon DB
+      if (username && password) {
+        try {
+          await fetch('/api/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              username: username,
+              password: password,
+              role: 'Siswa'
+            })
+          });
+          console.log("Akun berhasil terkirim ke Neon DB!");
+        } catch (err) {
+          console.error("Gagal sinkron ke Neon DB:", err);
+        }
+      }
+    }, 500);
+  }
+}, true);
   </script>
 </body>
 </html>
