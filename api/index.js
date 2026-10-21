@@ -4,13 +4,12 @@ const { Pool } = require('pg');
 const app = express();
 app.use(express.json());
 
-// Inisialisasi koneksi ke Neon DB
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: process.env.ELERMATH_URL,
   ssl: {
     rejectUnauthorized: false
   }
-}
+});
 
 // Inisialisasi Tabel Otomatis saat aplikasi berjalan
 const initDb = async () => {
