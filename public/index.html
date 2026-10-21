@@ -2120,27 +2120,28 @@ async function submitQuizResult(score, totalQuestions) {
     console.error("Gagal mengirim nilai:", err);
   }
 }
-    // ==========================================
-// FUNGSI DAFTAR AKUN BARU (ONLINE KE NEON DB)
-// ==========================================
-async function handleRegister(username, password, role = 'Siswa') {
+// Fungsi Pendaftaran Online ke Neon DB
+async function registerUserOnline(username, password, role = 'Siswa') {
   try {
-    const response = await fetch('/api/users', {
+    const response = await fetch('/api/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password, role })
     });
-    
+
     const result = await response.json();
+
     if (result.success) {
-      alert("Pendaftaran berhasil! Akun kamu sudah tersimpan di database Neon.");
-      // Otomatis login atau arahkan ke halaman login
+      alert(`Akun ${result.user.username} berhasil dibuat secara ONLINE di Neon DB!`);
+      return true;
     } else {
-      alert(result.error || "Gagal mendaftar akun.");
+      alert(`Gagal Mendaftar: ${result.message}`);
+      return false;
     }
   } catch (err) {
     console.error("Gagal terhubung ke server:", err);
-    alert("Terjadi kesalahan koneksi saat mendaftar.");
+    alert("Terjadi masalah koneksi server.");
+    return false;
   }
 }
   </script>
